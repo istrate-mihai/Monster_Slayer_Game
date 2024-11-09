@@ -19,38 +19,64 @@
     </header>
 
     <div id="game">
-      <section id="monster" class="container">
-        <h2>Monster Health</h2>
-        <div class="healthbar">
-          <div class="healthbar__value" :style="monsterBarStyles"></div>
+      <div id="main--area">
+        <section id="monster" class="container game-section">
+          <h2>Monster</h2>
+  
+          <div class="healthbar">
+            <div class="healthbar__value" :style="monsterBarStyles"></div>
+          </div>
+  
+          <div>
+            <img class="character--image" :src="monsterImage" alt="monster-image" />
+          </div>
+        </section>
+  
+        <section id="player" class="container game-section">
+          <h2>Hero</h2>
+  
+          <div class="healthbar">
+            <div class="healthbar__value" :style="playerBarStyles"></div>
+          </div>
+  
+          <div>
+            <img class="character--image" :src="heroImage" alt="hero-image" />
+          </div>
+        </section>
+  
+        <div class="container game-section" v-if="winner">
+          <h2>Game Over!</h2>
+          <h3 v-if="winner === 'monster'">You lost !</h3>
+          <h3 v-else-if="winner === 'player'">You won!</h3>
+          <h3 v-else>It's a draw</h3>
+          <button @click="startGame">Start Game</button>
         </div>
-      </section>
-
-      <section id="player" class="container">
-        <h2>Your Health</h2>
-        <div class="healthbar">
-          <div class="healthbar__value" :style="playerBarStyles"></div>
-        </div>
-      </section>
-
-      <div class="container" v-if="winner">
-        <h2>Game Over!</h2>
-        <h3 v-if="winner === 'monster'">You lost !</h3>
-        <h3 v-else-if="winner === 'player'">You won!</h3>
-        <h3 v-else>It's a draw</h3>
-        <button @click="startGame">Start Game</button>
+  
+        <section id="controls" class="game-section" v-else>
+          <button @click="attackMonster">ATTACK</button>
+          <button :disabled="mayUseSpecialAttack" @click="specialAttackMonster">SPECIAL ATTACK</button>
+          <button @click="healPlayer">HEAL</button>
+          <button @click="surrender">SURRENDER</button>
+        </section>
       </div>
 
-      <section id="controls" v-else>
-        <button @click="attackMonster">ATTACK</button>
-        <button :disabled="mayUseSpecialAttack" @click="specialAttackMonster">SPECIAL ATTACK</button>
-        <button @click="healPlayer">HEAL</button>
-        <button @click="surrender">SURRENDER</button>
-      </section>
-
-      <section id="log" class="container">
+      <section id="log" class="container game-section">
         <h2>Battle Log</h2>
-        <ul></ul>
+        <ul v-for="logMessage in logMessageList">
+          <span :class="logMessageByClass(logMessage)">
+            {{ capitalizeFirstLetter(logMessage.actionBy) }}
+          </span>
+          
+          <span v-if="logMessage.actionType === 'heal'">
+            heals himself for
+            <span class="log--heal">{{ logMessage.actionValue }}</span>
+          </span>
+
+          <span v-else>
+            attacks and deals
+            <span class="log--damage">{{ logMessage.actionValue }}</span>
+          </span>
+        </ul>
       </section>
     </div>
   </body>
